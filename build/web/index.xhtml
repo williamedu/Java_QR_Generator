@@ -1,0 +1,183 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+    <h:head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Convertidor de PDF a Código QR</title>
+        
+        <!-- Font Awesome -->
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+        
+        <!-- Archivo CSS externo -->
+        <link rel="stylesheet" href="styles.css" />
+    </h:head>
+    <h:body>
+        <div class="container">
+            <!-- Header -->
+            <header class="header">
+                <h1>Convertidor de PDF a Código QR</h1>
+                <p>Transforma tus documentos PDF en códigos QR fácilmente compartibles</p>
+            </header>
+            
+            <!-- Main Content -->
+            <h:form id="uploadForm" enctype="multipart/form-data">
+                <div class="main-content">
+                    <!-- Upload Section -->
+                    <div class="section">
+                        <h2>Sube tu archivo PDF</h2>
+                        
+                        <!-- Drag Drop Area with Visible Button -->
+                        <div id="dropArea" class="drop-area">
+                            <div>
+                                <i class="fas fa-file-pdf"></i>
+                                <p>Arrastra tu PDF aquí</p>
+                                <p>Formatos soportados: .pdf (Tamaño máximo: 5MB)</p>
+                                
+                                <!-- Botón visible para seleccionar archivo -->
+                                <div style="margin-top: 1.5rem;">
+                                    <label for="fileInput" class="select-file-btn">
+                                        <i class="fas fa-upload"></i> Seleccionar archivo
+                                    </label>
+                                    <input type="file" id="fileInput" accept=".pdf" style="display:none" />
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Selected File Info (hidden by default) -->
+                        <div id="fileInfoContainer" style="display:none; margin-top: 1rem;">
+                            <div style="display: flex; align-items: center; padding: 0.75rem; background-color: #f3f4f6; border-radius: 0.375rem;">
+                                <i class="fas fa-file-pdf" style="font-size: 1.5rem; color: #4f46e5; margin-right: 0.75rem;"></i>
+                                <div style="flex: 1;">
+                                    <p id="selectedFileName" style="font-weight: 500; margin: 0 0 0.25rem 0;">nombre_archivo.pdf</p>
+                                    <p id="selectedFileSize" style="color: #6b7280; font-size: 0.875rem; margin: 0;">Tamaño: 2.4 MB</p>
+                                </div>
+                                <button type="button" id="removeFileBtn" style="background: none; border: none; color: #6b7280; cursor: pointer;">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- Progress Bar (hidden by default) -->
+                        <div id="progressContainer" style="display:none; margin-top: 1rem;">
+                            <div style="display: flex; justify-content: space-between; font-size: 0.875rem; color: #475569; margin-bottom: 0.25rem;">
+                                <span>Subiendo archivo...</span>
+                                <span id="progressPercentage">0%</span>
+                            </div>
+                            <div class="progress-bar-container">
+                                <div id="progressBar" class="progress-bar"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Options Section -->
+                    <div class="section">
+                        <h2>Opciones del código QR</h2>
+                        
+                        <!-- Toggle for customization -->
+                        <div class="toggle-container">
+                            <div>
+                                <label class="toggle-label">Personalizar nombre del archivo QR</label>
+                                <p class="toggle-description">El nombre por defecto será el mismo que tu archivo PDF</p>
+                            </div>
+                            <div class="toggle-switch">
+                                <input type="checkbox" id="customizeToggle" class="toggle-input" />
+                                <label for="customizeToggle" class="toggle-label-switch"></label>
+                            </div>
+                        </div>
+                        
+                        <!-- Custom Name Field (hidden by default) -->
+                        <div id="customNameContainer" style="display:none" class="custom-name-container">
+                            <label for="customName" class="toggle-label">Nombre personalizado</label>
+                            <input type="text" id="customName" class="custom-input" placeholder="Ingresa un nombre para tu código QR" />
+                        </div>
+                        
+                        <!-- Process Button -->
+                        <div style="margin-top: 2rem; text-align: center;">
+                            <button type="button" id="processBtn" class="process-btn" disabled="disabled">
+                                <i class="fas fa-qrcode"></i> Procesar y Generar QR
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Results Section (hidden by default) -->
+                    <div id="resultsSection" style="display:none" class="section">
+                        <h2>Tu código QR está listo</h2>
+                        
+                        <div class="results-section">
+                            <!-- QR Code Preview -->
+                            <div class="qr-container">
+                                <div class="qr-code">
+                                    <!-- Placeholder QR image -->
+                                    <div style="width:200px; height:200px; background-color:#f3f4f6; display:flex; align-items:center; justify-content:center; flex-direction:column; border:1px solid #e5e7eb;">
+                                        <i class="fas fa-qrcode" style="font-size:3rem; color:#4f46e5; margin-bottom:0.5rem;"></i>
+                                        <span style="color:#6b7280; font-size:0.875rem;">Código QR</span>
+                                    </div>
+                                </div>
+                                <button id="downloadBtn" class="download-btn">
+                                    <i class="fas fa-download"></i> Descargar QR (PNG)
+                                </button>
+                            </div>
+                            
+                            <!-- QR Information -->
+                            <div class="info-container">
+                                <div class="info-box">
+                                    <h3>Cómo usar tu código QR</h3>
+                                    <ul class="info-list">
+                                        <li>
+                                            <i class="fas fa-check"></i>
+                                            <span>Imprime el código QR y colócalo en documentos físicos</span>
+                                        </li>
+                                        <li>
+                                            <i class="fas fa-check"></i>
+                                            <span>Incrústalo en presentaciones o sitios web</span>
+                                        </li>
+                                        <li>
+                                            <i class="fas fa-check"></i>
+                                            <span>Comparte el archivo PDF de forma segura</span>
+                                        </li>
+                                    </ul>
+                                </div>
+                                
+                                <div class="details-container">
+                                    <h4>Detalles del archivo</h4>
+                                    <div class="details-box">
+                                        <div class="detail-row">
+                                            <span class="detail-label">Nombre del archivo:</span>
+                                            <span id="qrFileName" class="detail-value">documento.pdf</span>
+                                        </div>
+                                        <div class="detail-row">
+                                            <span class="detail-label">Tamaño:</span>
+                                            <span id="qrFileSize" class="detail-value">2.4 MB</span>
+                                        </div>
+                                        <div class="detail-row">
+                                            <span class="detail-label">Fecha de generación:</span>
+                                            <span class="detail-value" id="generationDate"></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </h:form>
+            
+            <!-- Footer -->
+            <footer class="footer">
+                <p>© 2023 Convertidor PDF a QR. Todos los derechos reservados.</p>
+                <div class="footer-links">
+                    <a href="#">Ayuda</a>
+                    <a href="#">Privacidad</a>
+                    <a href="#">Términos</a>
+                </div>
+            </footer>
+        </div>
+
+        <!-- Archivo JavaScript externo -->
+        <script src="script.js"></script>
+    </h:body>
+</html>
